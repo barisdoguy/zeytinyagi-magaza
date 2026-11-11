@@ -13,12 +13,13 @@ const LINKS = [
 
 export function SiteNav({ cartCount }: { cartCount: number }) {
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => setOpen(false), [pathname]);
+  // Menü, açıldığı sayfaya bağlıdır: başka sayfaya geçilince kendiliğinden kapanır.
+  const [openOn, setOpenOn] = useState<string | null>(null);
+  const open = openOn === pathname;
+  const setOpen = (value: boolean) => setOpenOn(value ? pathname : null);
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpenOn(null);
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
@@ -56,7 +57,7 @@ export function SiteNav({ cartCount }: { cartCount: number }) {
           className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-kirec/40 md:hidden"
           aria-expanded={open}
           aria-controls="mobil-menu"
-          onClick={() => setOpen((v) => !v)}
+          onClick={() => setOpen(!open)}
         >
           <span className="sr-only">{open ? "Menüyü kapat" : "Menüyü aç"}</span>
           <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">

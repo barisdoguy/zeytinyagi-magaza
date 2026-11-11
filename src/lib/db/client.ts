@@ -14,7 +14,7 @@ export type Tx = Parameters<Parameters<Db["transaction"]>[0]>[0];
 const globalForDb = globalThis as unknown as { __magazaDb?: Db };
 
 export function dataDir(): string {
-  return path.resolve(process.cwd(), getEnv().DATA_DIR);
+  return path.resolve(/* turbopackIgnore: true */ process.cwd(), getEnv().DATA_DIR);
 }
 
 export function getDb(): Db {
@@ -26,7 +26,7 @@ export function getDb(): Db {
   sqlite.pragma("foreign_keys = ON");
   sqlite.pragma("busy_timeout = 5000");
   const db = drizzle(sqlite, { schema });
-  migrate(db, { migrationsFolder: path.resolve(process.cwd(), "drizzle") });
+  migrate(db, { migrationsFolder: path.resolve(/* turbopackIgnore: true */ process.cwd(), "drizzle") });
   seed(db);
   globalForDb.__magazaDb = db;
   return db;

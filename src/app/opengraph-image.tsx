@@ -3,6 +3,9 @@ import path from "node:path";
 import { ImageResponse } from "next/og";
 import { getSite } from "@/lib/site";
 
+// Derleme anında değil, her istekte güncel ayar ve veriyle üretilir.
+export const dynamic = "force-dynamic";
+
 export const alt = "Zeytin dalından süzülen bir damla zeytinyağı";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";

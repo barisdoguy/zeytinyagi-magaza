@@ -18,8 +18,18 @@ export type CouponCheck =
   | { ok: true; rule: CouponRule; discountKurus: number }
   | { ok: false; reason: string };
 
+const FOLD: Record<string, string> = { Ç: "C", Ğ: "G", İ: "I", Ö: "O", Ş: "S", Ü: "U" };
+
+/**
+ * Kodu büyük harfe çevirir ve Türkçe harfleri sadeleştirir; böylece
+ * "hosgeldin", "HOŞGELDİN" ve "Hosgeldın" aynı koda karşılık gelir.
+ */
 export function normalizeCouponCode(code: string): string {
-  return code.trim().toLocaleUpperCase("tr-TR").replace(/\s+/g, "");
+  return code
+    .trim()
+    .toLocaleUpperCase("tr-TR")
+    .replace(/[ÇĞİÖŞÜ]/g, (ch) => FOLD[ch])
+    .replace(/\s+/g, "");
 }
 
 /** Kuponun şu an, bu ara toplam için geçerli olup olmadığını denetler. */

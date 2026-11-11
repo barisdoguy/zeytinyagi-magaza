@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { checkCoupon, type CouponRecord } from "@/lib/coupons";
+import { checkCoupon, normalizeCouponCode, type CouponRecord } from "@/lib/coupons";
 import { formatTl, parseTlToKurus } from "@/lib/money";
 import { canTransition, manualTransitions } from "@/lib/orders/status";
 import { computeTotals } from "@/lib/pricing";
@@ -67,6 +67,9 @@ describe("kupon geçerliliği", () => {
     usedCount: 0,
     active: true,
   };
+  it("kodu büyük-küçük harf ve Türkçe harf farkına bakmadan eşleştirir", () => {
+    for (const input of ["hosgeldin", "HOŞGELDİN", " Hosgeldın ", "hoş geldin"]) expect(normalizeCouponCode(input)).toBe("HOSGELDIN");
+  });
   it("geçerli kuponu kabul eder", () => {
     const r = checkCoupon(base, 60000, 1500);
     expect(r.ok && r.discountKurus).toBe(6000);

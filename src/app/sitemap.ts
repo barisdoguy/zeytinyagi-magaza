@@ -4,6 +4,9 @@ import { LEGAL_SLUGS } from "@/lib/content/seed-pages";
 import { listPages } from "@/lib/pages";
 import { getSite } from "@/lib/site";
 
+// Derleme anında değil, her istekte güncel ayar ve veriyle üretilir.
+export const dynamic = "force-dynamic";
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const { siteUrl, indexable } = getSite();
   if (!indexable) return [];

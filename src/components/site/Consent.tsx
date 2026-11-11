@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 const COOKIE = "cerez_tercihi";
 const OPEN_EVENT = "cerez-tercihleri-ac";
@@ -16,11 +17,21 @@ declare global {
   }
 }
 
-function readChoice(): Choice | null {
+const listeners = new Set<() => void>();
+const subscribe = (listener: () => void) => {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+};
+/** Çerezin ham değeri; "" = henüz tercih yapılmamış. */
+function readRaw(): string {
   const match = document.cookie.split("; ").find((c) => c.startsWith(`${COOKIE}=`));
-  if (!match) return null;
+  return match ? match.slice(COOKIE.length + 1) : "";
+}
+
+function parseChoice(raw: string | null): Choice | null {
+  if (!raw) return null;
   try {
-    const value = JSON.parse(decodeURIComponent(match.slice(COOKIE.length + 1)));
+    const value = JSON.parse(decodeURIComponent(raw));
     return { analytics: value.a === 1, marketing: value.m === 1 };
   } catch {
     return null;
@@ -30,6 +41,7 @@ function readChoice(): Choice | null {
 function writeChoice(choice: Choice) {
   const value = encodeURIComponent(JSON.stringify({ a: choice.analytics ? 1 : 0, m: choice.marketing ? 1 : 0, t: Date.now() }));
   document.cookie = `${COOKIE}=${value}; path=/; max-age=${60 * 60 * 24 * 180}; samesite=lax`;
+  listeners.forEach((listener) => listener());
 }
 
 function loadScript(src: string) {
@@ -92,27 +104,29 @@ export function ConsentLink() {
 
 export function Consent({ tracking }: { tracking: Tracking }) {
   const hasTracking = Boolean(tracking.ga4 || tracking.metaPixel);
-  const [view, setView] = useState<"hidden" | "banner" | "settings">("hidden");
+  // Sunucuda ve ilk çizimde null: tercih bilinene kadar hiçbir şey gösterilmez.
+  const raw = useSyncExternalStore(subscribe, readRaw, () => null);
+  const saved = parseChoice(raw);
+  const [panel, setPanel] = useState<"closed" | "settings" | null>(null);
   const [draft, setDraft] = useState<Choice>({ analytics: false, marketing: false });
+  const view: "hidden" | "banner" | "settings" =
+    panel === "settings" ? "settings" : panel === "closed" || raw === null || saved || !hasTracking ? "hidden" : "banner";
 
   useEffect(() => {
-    const saved = readChoice();
-    if (saved) {
-      setDraft(saved);
-      applyChoice(saved, tracking);
-    } else if (hasTracking) setView("banner");
+    const current = parseChoice(readRaw());
+    if (current) applyChoice(current, tracking);
     const open = () => {
-      setDraft(readChoice() ?? { analytics: false, marketing: false });
-      setView("settings");
+      setDraft(parseChoice(readRaw()) ?? { analytics: false, marketing: false });
+      setPanel("settings");
     };
     window.addEventListener(OPEN_EVENT, open);
     return () => window.removeEventListener(OPEN_EVENT, open);
-  }, [hasTracking, tracking]);
+  }, [tracking]);
 
   const decide = (choice: Choice) => {
-    const previous = readChoice();
+    const previous = parseChoice(readRaw());
     writeChoice(choice);
-    setView("hidden");
+    setPanel("closed");
     // İzin geri alındıysa, yüklenmiş betikleri durdurmanın güvenilir yolu sayfayı yenilemektir.
     if (previous && ((previous.analytics && !choice.analytics) || (previous.marketing && !choice.marketing))) {
       window.location.reload();
@@ -136,7 +150,7 @@ export function Consent({ tracking }: { tracking: Tracking }) {
         {hasTracking
           ? " Ölçümleme ve pazarlama çerezlerini yalnızca siz izin verirseniz kullanırız."
           : " Bu sitede şu anda ölçümleme ya da pazarlama çerezi kullanılmıyor."}{" "}
-        <a href="/cerez-politikasi" className="font-semibold underline">Çerez politikası</a>
+        <Link href="/cerez-politikasi" className="font-semibold underline">Çerez politikası</Link>
       </p>
 
       {view === "settings" && hasTracking && (
@@ -167,13 +181,13 @@ export function Consent({ tracking }: { tracking: Tracking }) {
             <button type="button" className="btn btn-sm btn-dark" onClick={() => decide({ analytics: false, marketing: false })}>Tümünü reddet</button>
             <button type="button" className="btn btn-sm btn-dark" onClick={() => decide({ analytics: Boolean(tracking.ga4), marketing: Boolean(tracking.metaPixel) })}>Tümünü kabul et</button>
             {view === "banner" ? (
-              <button type="button" className="btn btn-sm btn-outline" onClick={() => setView("settings")}>Tercihleri ayarla</button>
+              <button type="button" className="btn btn-sm btn-outline" onClick={() => setPanel("settings")}>Tercihleri ayarla</button>
             ) : (
               <button type="button" className="btn btn-sm btn-outline" onClick={() => decide(draft)}>Seçimimi kaydet</button>
             )}
           </>
         ) : (
-          <button type="button" className="btn btn-sm btn-dark" onClick={() => setView("hidden")}>Kapat</button>
+          <button type="button" className="btn btn-sm btn-dark" onClick={() => setPanel("closed")}>Kapat</button>
         )}
       </div>
     </div>

@@ -95,15 +95,18 @@ type FieldProps = {
   placeholder?: string;
   className?: string;
   maxLength?: number;
+  /** Aynı sayfada aynı adlı alan birden çok formda geçiyorsa kimlikleri ayırmak için. */
+  idPrefix?: string;
 };
 
-export function Field({ name, label, type = "text", defaultValue = "", required, help, multiline, rows = 4, className = "", ...rest }: FieldProps) {
+export function Field({ name, label, type = "text", defaultValue = "", required, help, multiline, rows = 4, className = "", idPrefix = "", ...rest }: FieldProps) {
+  const id = idPrefix + name;
   const state = useFormState();
   const error = state?.fieldErrors?.[name];
   const value = state && !state.ok && state.values?.[name] !== undefined ? state.values[name] : defaultValue;
-  const describedBy = [help ? `${name}-help` : "", error ? `${name}-error` : ""].filter(Boolean).join(" ") || undefined;
+  const describedBy = [help ? `${id}-help` : "", error ? `${id}-error` : ""].filter(Boolean).join(" ") || undefined;
   const common = {
-    id: name,
+    id,
     name,
     defaultValue: value,
     required,
@@ -114,7 +117,7 @@ export function Field({ name, label, type = "text", defaultValue = "", required,
   };
   return (
     <div className={className}>
-      <label htmlFor={name} className="field-label">
+      <label htmlFor={id} className="field-label">
         {label}
         {required && (
           <span className="text-kiremit-koyu" aria-hidden="true">
@@ -125,12 +128,12 @@ export function Field({ name, label, type = "text", defaultValue = "", required,
       </label>
       {multiline ? <textarea rows={rows} {...common} /> : <input type={type} {...common} />}
       {help && (
-        <p id={`${name}-help`} className="field-help">
+        <p id={`${id}-help`} className="field-help">
           {help}
         </p>
       )}
       {error && (
-        <p id={`${name}-error`} className="field-error">
+        <p id={`${id}-error`} className="field-error">
           {error}
         </p>
       )}
