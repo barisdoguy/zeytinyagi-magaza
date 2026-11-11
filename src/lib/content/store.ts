@@ -37,3 +37,31 @@ export function shippingConfig(content: Content): ShippingConfig {
   const threshold = parseTlToKurus(content.freeShippingThresholdTl);
   return { configured: fee != null, feeKurus: fee ?? 0, freeThresholdKurus: threshold };
 }
+
+/** Fotoğraf yuvaları: gerçek fotoğraf yüklenene kadar sitede illüstrasyon gösterilir. */
+export const IMAGE_SLOTS = {
+  yore: { label: "Yöre / zeytinlik fotoğrafı", hint: "Ana sayfadaki yöre bölümü" },
+  sofra: { label: "Sofra fotoğrafı", hint: "Ana sayfadaki sofra bölümü" },
+  hikaye: { label: "Üretici / üretim fotoğrafı", hint: "Hikâyemiz sayfası" },
+} as const;
+export type ImageSlot = keyof typeof IMAGE_SLOTS;
+
+const slotKey = (slot: ImageSlot) => `__img_${slot}`;
+
+export function getSlotImages(db: Db | Tx = getDb()): Record<ImageSlot, string | null> {
+  const out: Record<ImageSlot, string | null> = { yore: null, sofra: null, hikaye: null };
+  for (const row of db.select().from(settings).all()) {
+    for (const slot of Object.keys(out) as ImageSlot[]) {
+      if (row.key === slotKey(slot) && row.value) out[slot] = row.value;
+    }
+  }
+  return out;
+}
+
+export function setSlotImage(slot: ImageSlot, file: string, db: Db | Tx = getDb()) {
+  const now = Date.now();
+  db.insert(settings)
+    .values({ key: slotKey(slot), value: file, updatedAt: now })
+    .onConflictDoUpdate({ target: settings.key, set: { value: file, updatedAt: now } })
+    .run();
+}

@@ -1,26 +1,317 @@
 @import "tailwindcss";
+@import "@fontsource-variable/fraunces/opsz.css";
+@import "@fontsource-variable/instrument-sans/wght.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * Renk paleti — "Kazdağı'nın gölgesinden Edremit Körfezi'ne"
+ * Markaya ait renkleri yalnızca buradan değiştirin.
+ */
+@theme {
+  --color-korfez: #12263a; /* Körfez Laciverti — koyu zemin, ana metin */
+  --color-korfez-acik: #1c3a55;
+  --color-kirec: #f3ede0; /* Kireç Taşı — açık zemin */
+  --color-kirec-koyu: #e7dcc6;
+  --color-altin: #e0a526; /* Sıvı Altın — vurgu (yalnızca koyu zeminde metin olarak) */
+  --color-altin-koyu: #7d5606; /* açık zeminde altın tonlu metin */
+  --color-kiremit: #c8452c; /* Kiremit — satın alma çağrısı */
+  --color-kiremit-koyu: #a8361f;
+  --color-yaprak: #8fa08a; /* Yaprak Gümüşü */
+  --color-cam: #2f3b24; /* Kazdağı Çamı */
+
+  --font-display: "Fraunces Variable", "Iowan Old Style", Georgia, serif;
+  --font-sans: "Instrument Sans Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --ease-out-soft: cubic-bezier(0.22, 0.8, 0.2, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--color-kirec);
+    color: var(--color-korfez);
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    text-rendering: optimizeLegibility;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    line-height: 1.08;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-altin);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 3px var(--color-korfez);
+    border-radius: 4px;
+  }
+  ::selection {
+    background: var(--color-altin);
+    color: var(--color-korfez);
+  }
+  input,
+  select,
+  textarea {
+    font: inherit;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .wrap {
+    width: 100%;
+    max-width: 76rem;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+  @media (min-width: 768px) {
+    .wrap {
+      padding-inline: 2.5rem;
+    }
+  }
+
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 3rem;
+    padding: 0.7rem 1.5rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.2;
+    text-align: center;
+    transition:
+      background-color 0.2s,
+      color 0.2s,
+      border-color 0.2s,
+      transform 0.2s var(--ease-out-soft);
+    cursor: pointer;
+  }
+  .btn:active {
+    transform: translateY(1px);
+  }
+  .btn[disabled],
+  .btn[aria-disabled="true"] {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+  .btn-primary {
+    background: var(--color-kiremit);
+    color: #fff;
+  }
+  .btn-primary:hover:not([disabled]) {
+    background: var(--color-kiremit-koyu);
+  }
+  .btn-gold {
+    background: var(--color-altin);
+    color: var(--color-korfez);
+  }
+  .btn-gold:hover:not([disabled]) {
+    background: #f0b93f;
+  }
+  .btn-dark {
+    background: var(--color-korfez);
+    color: var(--color-kirec);
+  }
+  .btn-dark:hover:not([disabled]) {
+    background: var(--color-korfez-acik);
+  }
+  .btn-outline {
+    border: 1.5px solid currentColor;
+    background: transparent;
+  }
+  .btn-outline:hover:not([disabled]) {
+    background: color-mix(in srgb, currentColor 10%, transparent);
+  }
+  .btn-sm {
+    min-height: 2.5rem;
+    padding: 0.4rem 1rem;
+    font-size: 0.9375rem;
+  }
+
+  .field-label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    margin-bottom: 0.35rem;
+  }
+  .field-input {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.65rem 0.9rem;
+    border-radius: 0.75rem;
+    border: 1.5px solid color-mix(in srgb, var(--color-korfez) 35%, transparent);
+    background: #fffdf8;
+    color: var(--color-korfez);
+  }
+  .field-input:hover {
+    border-color: color-mix(in srgb, var(--color-korfez) 60%, transparent);
+  }
+  .field-input[aria-invalid="true"] {
+    border-color: var(--color-kiremit);
+  }
+  .field-help {
+    font-size: 0.875rem;
+    color: color-mix(in srgb, var(--color-korfez) 72%, transparent);
+    margin-top: 0.3rem;
+  }
+  .field-error {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-kiremit-koyu);
+    margin-top: 0.3rem;
+  }
+
+  /* Henüz girilmemiş gerçek bilgi için işaret */
+  .pending {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.1rem 0.6rem;
+    border: 1.5px dashed currentColor;
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    opacity: 0.8;
+    white-space: nowrap;
+  }
+  .todo-mark {
+    background: color-mix(in srgb, var(--color-altin) 30%, transparent);
+    border-bottom: 2px dashed var(--color-altin-koyu);
+    padding: 0.05em 0.25em;
+    border-radius: 3px;
+    color: inherit;
+  }
+
+  .card {
+    background: #fffdf8;
+    border: 1px solid color-mix(in srgb, var(--color-korfez) 14%, transparent);
+    border-radius: 1.25rem;
+  }
+
+  .prose-page h2 {
+    font-size: 1.5rem;
+    margin-top: 2.25rem;
+    margin-bottom: 0.6rem;
+  }
+  .prose-page p {
+    margin-bottom: 0.9rem;
+  }
+  .prose-page ul {
+    list-style: disc;
+    padding-left: 1.3rem;
+    margin-bottom: 0.9rem;
+  }
+
+  /* İnce doku: düz renkli yüzeyleri canlandırır */
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.22;
+    mix-blend-mode: soft-light;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+/*
+ * Kaydırma animasyonları: yalnızca CSS, kaydırmayı kilitlemez.
+ * Desteklemeyen tarayıcıda ve "hareketi azalt" ayarında içerik düz görünür.
+ */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(2rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes drift {
+  from {
+    transform: translateY(2.5rem);
+  }
+  to {
+    transform: translateY(-2.5rem);
+  }
+}
+@keyframes drip {
+  0%,
+  55% {
+    transform: translateY(0) scaleY(1);
+    opacity: 1;
+  }
+  85% {
+    transform: translateY(46px) scaleY(1.15);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(70px) scaleY(1.15);
+    opacity: 0;
+  }
+}
+@keyframes sway {
+  from {
+    transform: rotate(-1.2deg);
+  }
+  to {
+    transform: rotate(1.2deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    [data-reveal] {
+      animation: reveal-up linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+    [data-drift] {
+      animation: drift linear both;
+      animation-timeline: view();
+    }
+  }
+  .art-sway {
+    transform-origin: 8% 22%;
+    animation: sway 7s ease-in-out infinite alternate;
+  }
+  .art-drip {
+    transform-box: fill-box;
+    transform-origin: 50% 0%;
+    animation: drip 5.5s ease-in 1.2s infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
