@@ -169,6 +169,16 @@ SQLite ve yüklenen görseller diske yazıldığı için **kalıcı diski olan**
 4. `DATA_DIR` klasörünü düzenli yedekleyin (veritabanı + `uploads/`).
 5. Sağlık denetimi: `GET /api/saglik`.
 
+### İnceleme için geçici kurulum (Render)
+
+Depodaki `render.yaml`, siteyi **canlıya almadan incelemek** için ücretsiz bir Render servisi tanımlar: deneme ödemesi açık, arama motorlarına kapalı. Bu kurulum Render üzerinde denenmedi.
+
+1. <https://render.com/deploy?repo=https://github.com/barisdoguy/zeytinyagi-magaza> adresini açın, Render hesabınızla girin.
+2. İstenen `ADMIN_EMAIL` ve `ADMIN_PASSWORD` (en az 10 karakter) değerlerini girin; ilk yönetici hesabı bunlarla açılır.
+3. Kurulum bitince Render size `https://….onrender.com` biçiminde bir adres verir.
+
+Ücretsiz planda kalıcı disk yoktur: servis yeniden başladığında girilen fiyatlar, siparişler ve yüklenen görseller sıfırlanır. Kalıcı kullanım için yukarıdaki "Dağıtım" adımlarını izleyin.
+
 ## Yayından önce tamamlanacaklar
 
 Panelde **Pano → Yayın öncesi kontrol listesi** bu maddelerin durumunu canlı gösterir.

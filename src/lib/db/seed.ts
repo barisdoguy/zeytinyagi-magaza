@@ -1,6 +1,23 @@
 import { eq } from "drizzle-orm";
 import type { Db } from "./client";
-import { pages, products, settings, variants } from "./schema";
+import { pages, products, settings, users, variants } from "./schema";
+import { hashPasswordSync, passwordProblem } from "../auth/password";
+
+/**
+ * Kabuk erişimi olmayan barındırmalar için: hiç kullanıcı yoksa ve ADMIN_EMAIL
+ * ile ADMIN_PASSWORD ortam değişkenleri tanımlıysa ilk yönetici hesabını açar.
+ * Varsayılan parola yoktur; değişkenler yoksa hiçbir şey yapılmaz. Hesap
+ * oluştuktan sonra bu değişkenleri kaldırın ve parolayı panelden değiştirin.
+ */
+function bootstrapAdmin(db: Db, now: number) {
+  const email = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  const password = process.env.ADMIN_PASSWORD;
+  if (!email || !password || !/^\S+@\S+\.\S+$/.test(email) || passwordProblem(password)) return;
+  if (db.select({ id: users.id }).from(users).limit(1).get()) return;
+  db.insert(users)
+    .values({ email, name: "Yönetici", role: "admin", passwordHash: hashPasswordSync(password), createdAt: now })
+    .run();
+}
 import { SEED_PAGES } from "../content/seed-pages";
 
 const SEEDED_FLAG = "__catalogSeeded";
@@ -17,6 +34,8 @@ export function seed(db: Db) {
       .onConflictDoNothing()
       .run();
   }
+
+  bootstrapAdmin(db, now);
 
   const flagged = db.select().from(settings).where(eq(settings.key, SEEDED_FLAG)).get();
   if (flagged) return;

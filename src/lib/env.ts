@@ -34,7 +34,10 @@ function clean(source: NodeJS.ProcessEnv) {
 
 export function getEnv(): Env {
   if (cached) return cached;
-  const parsed = schema.safeParse(clean(process.env));
+  const source = clean(process.env);
+  // Render gibi platformlar sitenin adresini kendi değişkeniyle verir.
+  if (!source.SITE_URL && source.RENDER_EXTERNAL_URL) source.SITE_URL = source.RENDER_EXTERNAL_URL;
+  const parsed = schema.safeParse(source);
   if (!parsed.success) {
     const detail = parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ");
     throw new Error(`Ortam değişkenleri geçersiz — ${detail}`);

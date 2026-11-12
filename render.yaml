@@ -1,0 +1,30 @@
+# Render üzerinde İNCELEME amaçlı kurulum (canlı yayın değildir).
+# Ücretsiz planda kalıcı disk yoktur: servis yeniden başladığında veritabanı
+# ve yüklenen görseller sıfırlanır. Gerçek yayın için kalıcı diskli bir plan
+# seçip DATA_DIR'i o diske yönlendirin (README → Dağıtım).
+services:
+  - type: web
+    name: zeytinyagi-magaza-inceleme
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/saglik
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: APP_SECRET
+        generateValue: true
+      - key: DATA_DIR
+        value: ./data
+      - key: PAYMENTS_PROVIDER
+        value: test
+      - key: PAYMENTS_MODE
+        value: test
+      - key: SITE_INDEXABLE
+        value: "false"
+      # İlk yönetici hesabı: kurulum sırasında siz girersiniz (depoya yazılmaz).
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false

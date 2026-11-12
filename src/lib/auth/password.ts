@@ -1,4 +1,4 @@
-import { randomBytes, scrypt, timingSafeEqual } from "node:crypto";
+import { randomBytes, scrypt, scryptSync, timingSafeEqual } from "node:crypto";
 import { promisify } from "node:util";
 
 const scryptAsync = promisify(scrypt) as (pw: string, salt: Buffer, len: number) => Promise<Buffer>;
@@ -8,6 +8,13 @@ export const MIN_PASSWORD_LENGTH = 10;
 export async function hashPassword(password: string): Promise<string> {
   const salt = randomBytes(16);
   const key = await scryptAsync(password.normalize("NFKC"), salt, KEY_LENGTH);
+  return `scrypt$${salt.toString("base64")}$${key.toString("base64")}`;
+}
+
+/** Eşzamanlı sürüm: yalnızca ilk kurulumdaki yönetici hesabı için (db/seed.ts). */
+export function hashPasswordSync(password: string): string {
+  const salt = randomBytes(16);
+  const key = scryptSync(password.normalize("NFKC"), salt, KEY_LENGTH);
   return `scrypt$${salt.toString("base64")}$${key.toString("base64")}`;
 }
 
