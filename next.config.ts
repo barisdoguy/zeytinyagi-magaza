@@ -25,6 +25,7 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       { source: "/(.*)", headers: securityHeaders },
+      { source: "/fonts/:file*", headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }] },
       {
         source: "/yonetim/:path*",
         headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
