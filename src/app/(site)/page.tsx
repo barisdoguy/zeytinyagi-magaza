@@ -66,7 +66,7 @@ export default function HomePage() {
               <Link href="/hikayemiz" className="btn btn-outline">Hikâyemizi oku</Link>
             </div>
           </div>
-          <div className="mx-auto w-full max-w-md md:col-span-6 md:max-w-none md:-mr-10 md:scale-110">
+          <div className="mx-auto w-full max-w-md md:col-span-6 md:max-w-none">
             <HeroVisual />
           </div>
         </div>
@@ -110,7 +110,7 @@ export default function HomePage() {
                 <h3 className="mt-4 text-2xl">{step.title}</h3>
                 <p className="mt-2 text-kirec/85">{step.text}</p>
                 <div className="mt-5 border-t border-kirec/20 pt-4">
-                  <p className="eyebrow text-yaprak">Bizde nasıl?</p>
+                  <p className="eyebrow text-kirec/75">Bizde nasıl?</p>
                   {step.note ? <p className="mt-2">{step.note}</p> : <p className="mt-2"><span className="pending">Üretici notu eklenecek</span></p>}
                 </div>
               </li>

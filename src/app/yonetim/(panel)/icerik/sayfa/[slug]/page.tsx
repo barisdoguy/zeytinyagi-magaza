@@ -35,7 +35,7 @@ export default async function EditPagePage({ params }: { params: Promise<{ slug:
           <Field name="body" label="Metin" multiline rows={26} defaultValue={page.body} />
           <div className="max-w-sm">
             <label htmlFor="status" className="field-label">Durum</label>
-            <select id="status" name="status" defaultValue={page.status} className="field-input">
+            <select key={page.status} id="status" name="status" defaultValue={page.status} className="field-input">
               <option value="draft">Taslak — sayfada “taslak” uyarısı görünür</option>
               <option value="published">Yayında</option>
             </select>

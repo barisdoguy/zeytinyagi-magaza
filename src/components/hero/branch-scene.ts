@@ -104,6 +104,7 @@ export function mountBranchScene(container: HTMLElement, onReady: () => void): (
   scene.add(rim);
 
   const branch = new Group();
+  branch.scale.setScalar(0.82);
   scene.add(branch);
   const disposables: { dispose(): void }[] = [];
   const track = <T extends { dispose(): void }>(item: T) => {

@@ -17,7 +17,8 @@ export function ProductForm({ product }: { product?: Product }) {
       <div className="grid gap-4 md:grid-cols-2">
         <div>
           <label htmlFor="status" className="field-label">Durum</label>
-          <select id="status" name="status" defaultValue={product?.status ?? "draft"} className="field-input">
+          {/* key: kayıttan sonra seçili değer sunucudaki güncel durumla yeniden kurulur */}
+          <select key={product?.status} id="status" name="status" defaultValue={product?.status ?? "draft"} className="field-input">
             <option value="draft">Taslak — sitede “yakında” olarak görünür, satın alınamaz</option>
             <option value="active">Yayında — fiyatlı seçenekler satın alınabilir</option>
             <option value="archived">Arşiv — sitede görünmez</option>

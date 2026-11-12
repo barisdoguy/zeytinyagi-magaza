@@ -21,7 +21,7 @@ export function VariantForm({ productId, variant }: { productId: number; variant
         </div>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <label className="flex items-center gap-2">
-            <input type="checkbox" name="active" defaultChecked={variant?.active ?? true} className="h-5 w-5" /> Sitede göster
+            <input key={String(variant?.active)} type="checkbox" name="active" defaultChecked={variant?.active ?? true} className="h-5 w-5" /> Sitede göster
           </label>
           <SubmitButton className="btn btn-sm btn-dark" pendingLabel="Kaydediliyor…">{variant ? "Seçeneği kaydet" : "Seçenek ekle"}</SubmitButton>
         </div>

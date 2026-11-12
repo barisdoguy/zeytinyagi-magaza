@@ -157,6 +157,30 @@ try {
     await context.close();
   });
 
+  console.log("Hareket ve 3D");
+  await step("masaüstünde 3D sahne sonradan yüklenir; 'hareketi azalt' ve mobilde yüklenmez", async () => {
+    const consent = [{ name: "cerez_tercihi", value: encodeURIComponent(JSON.stringify({ a: 0, m: 0, t: 1 })), url: BASE }];
+    const count = async (options) => {
+      const context = await browser.newContext(options);
+      await context.addCookies(consent);
+      const page = await context.newPage();
+      const scripts = [];
+      page.on("response", (r) => r.url().endsWith(".js") && scripts.push(r.url()));
+      await page.goto(BASE, { waitUntil: "networkidle" });
+      await page.waitForTimeout(2500);
+      const result = { canvas: await page.locator("canvas").count(), svg: await page.locator('svg[role="img"]').first().isVisible(), scripts: scripts.length };
+      await context.close();
+      return result;
+    };
+    const desktop = await count({ viewport: { width: 1440, height: 900 } });
+    const reduced = await count({ viewport: { width: 1440, height: 900 }, reducedMotion: "reduce" });
+    const mobile = await count({ ...devices["iPhone 13"] });
+    expect(reduced.canvas === 0 && reduced.svg, `hareketi azalt: ${JSON.stringify(reduced)}`);
+    expect(mobile.canvas === 0 && mobile.svg, `mobil: ${JSON.stringify(mobile)}`);
+    expect(desktop.scripts > reduced.scripts, "3D kodu azaltılmış harekette de indirildi");
+    console.log(`      (masaüstü canvas: ${desktop.canvas}; WebGL yoksa SVG yedek kalır)`);
+  });
+
   console.log("Yayın öncesi vitrin");
   const shopper = await browser.newContext({ ...devices["iPhone 13"] });
   const shop = await shopper.newPage();

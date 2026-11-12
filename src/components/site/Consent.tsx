@@ -142,7 +142,7 @@ export function Consent({ tracking }: { tracking: Tracking }) {
       role="dialog"
       aria-modal="false"
       aria-labelledby="cerez-baslik"
-      className="fixed inset-x-3 bottom-3 z-50 mx-auto max-w-2xl rounded-2xl border border-korfez/15 bg-[#fffdf8] p-5 text-korfez shadow-2xl md:p-6"
+      className="fixed inset-x-3 bottom-3 z-50 max-w-lg rounded-2xl md:right-auto md:bottom-5 md:left-5 border border-korfez/15 bg-[#fffdf8] p-5 text-korfez shadow-2xl md:p-6"
     >
       <h2 id="cerez-baslik" className="text-xl">Çerez tercihleri</h2>
       <p className="mt-2 text-[0.9375rem]">
