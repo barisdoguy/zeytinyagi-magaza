@@ -43,3 +43,4 @@ next-env.d.ts
 # yerel veri (veritabanı, yüklenen görseller)
 /data/
 !.env.example
+/zeytinyagi-magaza-kaynak.zip
